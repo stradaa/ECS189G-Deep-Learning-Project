@@ -3,6 +3,7 @@ from stages.stage_2_code.Method_MLP import Method_MLP
 from stages.stage_2_code.Result_Saver import Result_Saver
 from stages.stage_2_code.Setting_KFold_CV import Setting_KFold_CV
 from stages.stage_2_code.Setting_Train_Test_Split import Setting_Train_Test_Split
+from stages.stage_2_code.Trainfile_Testfile_split import TwoFileSplit
 from stages.stage_2_code.Evaluate_Accuracy import Evaluate_Accuracy
 import numpy as np
 import torch
@@ -18,6 +19,9 @@ if 1:
     data_obj = Dataset_Loader('stage_2_data', '')
     data_obj.dataset_source_folder_path = '../../data/stage_2_data/'
     data_obj.dataset_source_file_name = 'training_stage_2.txt'
+    data_obj.testset_source_folder_path = '../../data/stage_2_data/'
+    data_obj.testset_source_file_name = 'training_stage_2.txt'
+
 
     method_obj = Method_MLP('multi-layer perceptron', '')
 
@@ -25,7 +29,7 @@ if 1:
     result_obj.result_destination_folder_path = '../../result/stage_2_result/MLP_'
     result_obj.result_destination_file_name = 'prediction_result'
 
-    setting_obj = Setting_KFold_CV('k fold cross validation', '')
+    setting_obj = TwoFileSplit('Train Test Split', '')
     # setting_obj = Setting_Tra
     # in_Test_Split('train test split', '')
 

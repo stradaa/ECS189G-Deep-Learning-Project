@@ -12,15 +12,18 @@ class Dataset_Loader(dataset):
     data = None
     dataset_source_folder_path = None
     dataset_source_file_name = None
-    
+    testset_source_folder_path = None
+    testset_source_file_name = None
+
     def __init__(self, dName=None, dDescription=None):
         super().__init__(dName, dDescription)
     
     def load(self):
-        print('loading data...')
+        print('loading training data...')
         X = []
         y = []
         f = open(self.dataset_source_folder_path + self.dataset_source_file_name, 'r')
+
         for line in f:
             line = line.strip('\n')
 
@@ -29,4 +32,22 @@ class Dataset_Loader(dataset):
             X.append(elements[1:])
             y.append(elements[0])
         f.close()
-        return {'X': X, 'y': y}
+
+        print('loading testing data...')
+        testX = []
+        testY = []
+
+        f2 = open(self.testset_source_folder_path + self.testset_source_file_name, 'r')
+
+        for line in f2:
+            line = line.strip('\n')
+
+            elements = [int(i) for i in line.split()]
+
+            testX.append(elements[1:])
+            testY.append(elements[0])
+        f.close()
+
+        return {'X': X, 'y': y, 'testX': testX, 'testY': testY}
+
+
