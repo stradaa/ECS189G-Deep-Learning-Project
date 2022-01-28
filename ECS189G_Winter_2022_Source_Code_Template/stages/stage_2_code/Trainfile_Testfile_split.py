@@ -32,4 +32,4 @@ class TwoFileSplit(setting):
 
         self.evaluate.data = learned_result
 
-        return self.evaluate.evaluate(), None
+        return self.evaluate.evaluate()

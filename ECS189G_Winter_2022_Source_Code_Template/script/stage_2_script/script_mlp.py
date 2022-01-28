@@ -18,9 +18,9 @@ if 1:
     # ---- objection initialization section ---------------
     data_obj = Dataset_Loader('stage_2_data', '')
     data_obj.dataset_source_folder_path = '../../data/stage_2_data/'
-    data_obj.dataset_source_file_name = 'training_stage_2.txt'
+    data_obj.dataset_source_file_name = 'training_stage_2.csv'
     data_obj.testset_source_folder_path = '../../data/stage_2_data/'
-    data_obj.testset_source_file_name = 'training_stage_2.txt'
+    data_obj.testset_source_file_name = 'testing_stage_2.csv'
 
 
     method_obj = Method_MLP('multi-layer perceptron', '')
@@ -40,9 +40,10 @@ if 1:
     print('************ Start ************')
     setting_obj.prepare(data_obj, method_obj, result_obj, evaluate_obj)
     setting_obj.print_setup_summary()
-    mean_score, std_score = setting_obj.load_run_save_evaluate()
+    metrics = setting_obj.load_run_save_evaluate()
     print('************ Overall Performance ************')
-    print('MLP Accuracy: ' + str(mean_score) + ' +/- ' + str(std_score))
+    print('MLP Metrics are as follows: ')
+    print(' Accuracy, Precision, Recall, F1 ... ' + str(metrics))
     print('************ Finish ************')
     # ------------------------------------------------------
 

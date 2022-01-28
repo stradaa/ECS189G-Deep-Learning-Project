@@ -29,9 +29,12 @@ class Method_MLP(method, nn.Module):
         self.fc_layer_1 = nn.Linear(784, 50)
         # check here for nn.ReLU doc: https://pytorch.org/docs/stable/generated/torch.nn.ReLU.html
         self.activation_func_1 = nn.ReLU()
-        self.fc_layer_2 = nn.Linear(50, 10)
+        self.fc_layer_2 = nn.Linear(50, 20)
         # check here for nn.Softmax doc: https://pytorch.org/docs/stable/generated/torch.nn.Softmax.html
-        self.activation_func_2 = nn.Softmax(dim=1)
+        self.activation_func_2 = nn.ReLU()
+        self.fc_layer_3 = nn.Linear(20, 10)
+        # check here for nn.Softmax doc: https://pytorch.org/docs/stable/generated/torch.nn.Softmax.html
+        self.activation_func_3 = nn.Softmax(dim=1)
 
     # it defines the forward propagation function for input x
     # this function will calculate the output layer by layer
@@ -84,7 +87,7 @@ class Method_MLP(method, nn.Module):
 
             if epoch%30 == 0:
                 accuracy_evaluator.data = {'true_y': y_true, 'pred_y': y_pred.max(1)[1]}
-                print('Epoch:', epoch, 'Accuracy:', accuracy_evaluator.evaluate(), 'Loss:', train_loss.item())
+                print('Epoch:', epoch, 'Metrics:', accuracy_evaluator.evaluate(), 'Loss:', train_loss.item())
     
     def test(self, X):
         # do the testing, and result the result
