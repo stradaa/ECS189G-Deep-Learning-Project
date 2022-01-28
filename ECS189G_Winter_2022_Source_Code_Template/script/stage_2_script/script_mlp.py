@@ -1,32 +1,32 @@
-from stages.stage_1_code.Dataset_Loader import Dataset_Loader
-from stages.stage_1_code.Method_MLP import Method_MLP
-from stages.stage_1_code.Result_Saver import Result_Saver
-from stages.stage_1_code.Setting_KFold_CV import Setting_KFold_CV
-from stages.stage_1_code.Setting_Train_Test_Split import Setting_Train_Test_Split
-from stages.stage_1_code.Evaluate_Accuracy import Evaluate_Accuracy
+from stages.stage_2_code.Dataset_Loader import Dataset_Loader
+from stages.stage_2_code.Method_MLP import Method_MLP
+from stages.stage_2_code.Result_Saver import Result_Saver
+from stages.stage_2_code.Setting_KFold_CV import Setting_KFold_CV
+from stages.stage_2_code.Setting_Train_Test_Split import Setting_Train_Test_Split
+from stages.stage_2_code.Evaluate_Accuracy import Evaluate_Accuracy
 import numpy as np
 import torch
 
-#---- Multi-Layer Perceptron script ----
+# ---- Multi-Layer Perceptron script ----
 if 1:
-    #---- parameter section -------------------------------
+    # ---- parameter section -------------------------------
     np.random.seed(2)
     torch.manual_seed(2)
-    #------------------------------------------------------
+    # ------------------------------------------------------
 
-    # ---- objection initialization setction ---------------
-    data_obj = Dataset_Loader('toy', '')
-    data_obj.dataset_source_folder_path = '../../data/stage_1_data/'
-    data_obj.dataset_source_file_name = 'toy_data_file.txt'
+    # ---- objection initialization section ---------------
+    data_obj = Dataset_Loader('stage_2_data', '')
+    data_obj.dataset_source_folder_path = '../../data/stage_2_data/'
+    data_obj.dataset_source_file_name = 'training_stage_2.txt'
 
     method_obj = Method_MLP('multi-layer perceptron', '')
 
     result_obj = Result_Saver('saver', '')
-    result_obj.result_destination_folder_path = '../../result/stage_1_result/MLP_'
+    result_obj.result_destination_folder_path = '../../result/stage_2_result/MLP_'
     result_obj.result_destination_file_name = 'prediction_result'
 
     setting_obj = Setting_KFold_CV('k fold cross validation', '')
-    #setting_obj = Setting_Tra
+    # setting_obj = Setting_Tra
     # in_Test_Split('train test split', '')
 
     evaluate_obj = Evaluate_Accuracy('accuracy', '')
@@ -41,6 +41,5 @@ if 1:
     print('MLP Accuracy: ' + str(mean_score) + ' +/- ' + str(std_score))
     print('************ Finish ************')
     # ------------------------------------------------------
-    
 
-    
+
