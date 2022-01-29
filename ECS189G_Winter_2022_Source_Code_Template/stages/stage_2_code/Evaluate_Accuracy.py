@@ -15,5 +15,5 @@ class Evaluate_Accuracy(evaluate):
     def evaluate(self):
         print('evaluating performance...')
         print('Metrics are as follows: Accuracy, Precision, Recall, F1 ...')
-        return accuracy_score(self.data['true_y'], self.data['pred_y']), precision_score(self.data['true_y'], self.data['pred_y'], average='macro'), recall_score(self.data['true_y'], self.data['pred_y'], average='macro', zero_division=0), f1_score(self.data['true_y'], self.data['pred_y'], average='macro')
+        return accuracy_score(self.data['true_y'], self.data['pred_y']), precision_score(self.data['true_y'], self.data['pred_y'], average='macro', zero_division=0), recall_score(self.data['true_y'], self.data['pred_y'], average='macro', zero_division=0), f1_score(self.data['true_y'], self.data['pred_y'], average='macro')
         
