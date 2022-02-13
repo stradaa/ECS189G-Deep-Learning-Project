@@ -1,3 +1,10 @@
+'''
+Concrete SettingModule class for a specific experimental SettingModule
+'''
+
+# Copyright (c) 2017-Current Jiawei Zhang <jiawei@ifmlab.org>
+# License: TBD
+
 from code.base_class.setting import setting
 from sklearn.model_selection import train_test_split
 import numpy as np
@@ -23,4 +30,3 @@ class Setting_Train_Test_Split(setting):
         self.evaluate.data = learned_result
 
         return self.evaluate.evaluate(), None
-

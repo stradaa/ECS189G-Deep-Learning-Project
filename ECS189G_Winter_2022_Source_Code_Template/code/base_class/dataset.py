@@ -5,7 +5,6 @@ Base IO class for all datasets
 # Copyright (c) 2017 Jiawei Zhang <jwzhanggy@gmail.com>
 # License: TBD
 
-
 import abc
 
 class dataset:
