@@ -37,10 +37,10 @@ class Method_CNN_CIFAR(method, nn.Module):
         self.activation_func_3 = nn.ReLU()
         self.pool3 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.fc_layer_1 = nn.Linear(16*7*7, 500)
+        self.fc_layer_1 = nn.Linear(24*4*4, 330)
         self.activation_func_3 = nn.ReLU()
 
-        self.fc_layer_2 = nn.Linear(500, 250)
+        self.fc_layer_2 = nn.Linear(330, 250)
         self.activation_func_3 = nn.ReLU()
 
         self.fc_layer_3 = nn.Linear(250, 100)
@@ -71,13 +71,13 @@ class Method_CNN_CIFAR(method, nn.Module):
         h = self.activation_func_3(self.conv3(h))
         # print(h.shape)
         h = self.pool3(h)
-        # print(h.shape)
+        #print(h.shape)
 
 
 
 
         #flatten the conv layer
-        h = h.view(-1, 16*7*7)
+        h = h.view(-1, 24*4*4)
 
         h = self.activation_func_3(self.fc_layer_1(h))
 
