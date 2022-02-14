@@ -15,7 +15,7 @@ import numpy as np
 class Method_CNN(method, nn.Module):
     data = None
     # it defines the max rounds to train the model
-    max_epoch = 90
+    max_epoch = 10
     # it defines the learning rate for gradient descent based optimizer for model learning
     learning_rate = 1e-3
 
@@ -25,20 +25,18 @@ class Method_CNN(method, nn.Module):
         method.__init__(self, mName, mDescription)
         nn.Module.__init__(self)
 
-        self.conv1 = nn.Conv2d(1, 6, 5, stride=2)
+        self.conv1 = nn.Conv2d(1, 3, 4)
         self.activation_func_1 = nn.LeakyReLU()
-        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.conv2 = nn.Conv2d(6, 12, 5, stride=2)
+        self.conv2 = nn.Conv2d(3, 12, 4)
         self.activation_func_2 = nn.LeakyReLU()
+        self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.fc_layer_1 = nn.Linear(300, 100)
+        self.fc_layer_1 = nn.Linear(1, 11)
         self.activation_func_3 = nn.LeakyReLU()
 
-        self.fc_layer_2 = nn.Linear(100, 50)
-        self.activation_func_4 = nn.LeakyReLU()
-
-        self.fc_layer_3 = nn.Linear(50, 10)
+        self.fc_layer_3 = nn.Linear(11, 10)
         self.activation_func_5 = nn.Softmax(dim=1)
 
     # it defines the forward propagation function for input x
@@ -49,22 +47,25 @@ class Method_CNN(method, nn.Module):
 
         # Define how our input travels through the previously defined layers
 
+        print("conv1: -----------------")
+        print(x.shape)
         h = self.activation_func_1(self.conv1(x))
-        print("shit fuck: -----------------")
-        h = self.pool(h)
-
-
+        print(h.shape)
+        print("pool_1:")
+        h = self.pool1(h)
+        print(h.shape)
+        print("conv2: ")
         h = self.activation_func_2(self.conv2(h))
-        h = self.pool(h)
+        h = self.pool2(h)
 
-
-
+        print("fc_layer1:")
         h = self.activation_func_3(self.fc_layer_1(h))
-        h = self.activation_func_4(self.fc_layer_2(h))
 
+        print("output layer:")
         # output layer result
         y_pred = self.activation_func_5(self.fc_layer_3(h))
-
+        print(y_pred[0])
+        print("------------------")
         return y_pred
 
     # backward error propagation will be implemented by pytorch automatically
@@ -85,11 +86,13 @@ class Method_CNN(method, nn.Module):
         for epoch in range(self.max_epoch):  # you can do an early stop if self.max_epoch is too much...
 
             # get the output, we need to covert X into torch.tensor so pytorch algorithm can operate on it
-            # check here for the gradient init doc: https://pytorch.org/docs/stable/generated/torch.optim.Optimizer.zero_grad.html
             optimizer.zero_grad()
 
+            print("here")
             y_pred = self.forward(torch.FloatTensor(np.array(X)))
+
             # convert y to torch.tensor as well
+            print("here2")
             y_true = torch.LongTensor(np.array(y))
             # calculate the training loss
             train_loss = loss_function(y_pred, y_true)
@@ -102,7 +105,7 @@ class Method_CNN(method, nn.Module):
             # update the variables according to the optimizer and the gradients calculated by the above loss.backward function
             optimizer.step()
 
-            if epoch % 30 == 0:
+            if epoch % 2 == 0:
                 accuracy_evaluator.data = {'true_y': y_true, 'pred_y': y_pred.max(1)[1]}
                 print('Epoch:', epoch, 'Metrics:', accuracy_evaluator.evaluate(), 'Loss:', train_loss.item())
 
