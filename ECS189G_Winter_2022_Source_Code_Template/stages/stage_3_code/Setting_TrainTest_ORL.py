@@ -30,11 +30,10 @@ class TrainTestSplit_ORL(setting):
             # extract image data and convert
             X_train.append(image['image'])
             # extract label
-            y_train.append(image['label'])
+            y_train.append(image['label']-1)
         X_train = torch.from_numpy(np.array(X_train))
 
         X_train = torch.permute(X_train, (0,3,1,2))
-
 
         #load lest data
         test = loaded_data['test']
@@ -45,9 +44,12 @@ class TrainTestSplit_ORL(setting):
             # extract image data and convert
             X_test.append(image['image'])
             # extract label
-            y_test.append(image['label'])
+            y_test.append(image['label']-1)
 
         X_test = torch.from_numpy(np.array(X_test))
+
+        X_test = torch.permute(X_test, (0, 3, 1, 2))
+
 
         # run MethodModule
         self.method.data = {'train': {'X': X_train, 'y': y_train}, 'test': {'X': X_test, 'y': y_test}}

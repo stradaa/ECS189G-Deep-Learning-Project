@@ -8,7 +8,9 @@ from stages.stage_3_code.Evaluate_Accuracy import Evaluate_Accuracy
 import numpy as np
 import torch
 
-control = input("chose your dataset. 1 for MNIST, 2 for ORL, and 3 for CIFAR: ")
+#control = input("chose your dataset. 1 for MNIST, 2 for ORL, and 3 for CIFAR: ")
+
+control = "2"
 
 if control == "1":
     # ---- parameter section -------------------------------

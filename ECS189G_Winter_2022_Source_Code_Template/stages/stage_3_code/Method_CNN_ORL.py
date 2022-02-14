@@ -15,7 +15,7 @@ import numpy as np
 class Method_CNN_ORL(method, nn.Module):
     data = None
     # it defines the max rounds to train the model
-    max_epoch = 10
+    max_epoch = 100
     # it defines the learning rate for gradient descent based optimizer for model learning
     learning_rate = 1e-3
 
@@ -42,8 +42,11 @@ class Method_CNN_ORL(method, nn.Module):
         self.fc_layer_3 = nn.Linear(2000, 1000)
         self.activation_func_5 = nn.LeakyReLU()
 
-        self.fc_layer_4 = nn.Linear(1000, 40)
-        self.activation_func_6 = nn.Softmax(dim=1)
+        self.fc_layer_4 = nn.Linear(1000, 500)
+        self.activation_func_6 = nn.LeakyReLU()
+
+        self.fc_layer_5 = nn.Linear(500, 40)
+        self.activation_func_7 = nn.Softmax(dim=1)
 
     # it defines the forward propagation function for input x
     # this function will calculate the output layer by layer
@@ -52,15 +55,15 @@ class Method_CNN_ORL(method, nn.Module):
         '''Forward propagation'''
 
         # Define how our input travels through the previously defined layers
-        print(x.shape)
+
         h = self.activation_func_1(self.conv1(x))
-        print(h.shape)
+
         h = self.pool1(h)
-        print(h.shape)
+
         h = self.activation_func_2(self.conv2(h))
-        print(h.shape)
+
         h = self.pool2(h)
-        print(h.shape)
+
         #flatten the conv layer
         h = h.view(-1, 16*25*20)
 
@@ -70,8 +73,10 @@ class Method_CNN_ORL(method, nn.Module):
 
         h = self.activation_func_5(self.fc_layer_3(h))
 
+        h = self.activation_func_6(self.fc_layer_4(h))
+
         # output layer result
-        y_pred = self.activation_func_6(self.fc_layer_4(h))
+        y_pred = self.activation_func_7(self.fc_layer_5(h))
         return y_pred
 
     # backward error propagation will be implemented by pytorch automatically
@@ -97,6 +102,7 @@ class Method_CNN_ORL(method, nn.Module):
 
             # convert y to torch.tensor as well
             y_true = torch.LongTensor(np.array(y))
+
             # calculate the training loss
             train_loss = loss_function(y_pred, y_true)
 
@@ -108,7 +114,7 @@ class Method_CNN_ORL(method, nn.Module):
             # update the variables according to the optimizer and the gradients calculated by the above loss.backward function
             optimizer.step()
 
-            if epoch % 2 == 0:
+            if epoch % 20 == 0:
                 accuracy_evaluator.data = {'true_y': y_true, 'pred_y': y_pred.max(1)[1]}
                 print('Epoch:', epoch, 'Metrics:', accuracy_evaluator.evaluate(), 'Loss:', train_loss.item())
 
