@@ -15,7 +15,7 @@ import numpy as np
 class Method_CNN_ORL(method, nn.Module):
     data = None
     # it defines the max rounds to train the model
-    max_epoch = 100
+    max_epoch = 500
     # it defines the learning rate for gradient descent based optimizer for model learning
     learning_rate = 1e-3
 
@@ -33,19 +33,23 @@ class Method_CNN_ORL(method, nn.Module):
         self.activation_func_2 = nn.LeakyReLU()
         self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.fc_layer_1 = nn.Linear(16*20*25, 4000)
+        self.conv3 = nn.Conv2d(16, 26, 4)
+        self.activation_func_3 = nn.LeakyReLU()
+        self.pool3 = nn.MaxPool2d(kernel_size=2, stride=2)
+
+        self.fc_layer_1 = nn.Linear(26*11*8, 1500)
         self.activation_func_3 = nn.LeakyReLU()
 
-        self.fc_layer_2 = nn.Linear(4000, 2000)
+        self.fc_layer_2 = nn.Linear(1500, 750)
         self.activation_func_4 = nn.LeakyReLU()
 
-        self.fc_layer_3 = nn.Linear(2000, 1000)
+        self.fc_layer_3 = nn.Linear(750, 300)
         self.activation_func_5 = nn.LeakyReLU()
 
-        self.fc_layer_4 = nn.Linear(1000, 500)
+        self.fc_layer_4 = nn.Linear(300, 150)
         self.activation_func_6 = nn.LeakyReLU()
 
-        self.fc_layer_5 = nn.Linear(500, 40)
+        self.fc_layer_5 = nn.Linear(150, 40)
         self.activation_func_7 = nn.Softmax(dim=1)
 
     # it defines the forward propagation function for input x
@@ -57,15 +61,21 @@ class Method_CNN_ORL(method, nn.Module):
         # Define how our input travels through the previously defined layers
 
         h = self.activation_func_1(self.conv1(x))
-
+        #print(h.shape)
         h = self.pool1(h)
-
+        #print(h.shape)
         h = self.activation_func_2(self.conv2(h))
-
+        #print(h.shape)
         h = self.pool2(h)
+        #print(h.shape)
+        h = self.activation_func_3(self.conv3(h))
+        #print(h.shape)
+        h = self.pool3(h)
+        #print(h.shape)
+
 
         #flatten the conv layer
-        h = h.view(-1, 16*25*20)
+        h = h.view(-1, 26*11*8)
 
         h = self.activation_func_3(self.fc_layer_1(h))
 
@@ -114,7 +124,7 @@ class Method_CNN_ORL(method, nn.Module):
             # update the variables according to the optimizer and the gradients calculated by the above loss.backward function
             optimizer.step()
 
-            if epoch % 20 == 0:
+            if epoch % 50 == 0:
                 accuracy_evaluator.data = {'true_y': y_true, 'pred_y': y_pred.max(1)[1]}
                 print('Epoch:', epoch, 'Metrics:', accuracy_evaluator.evaluate(), 'Loss:', train_loss.item())
 
