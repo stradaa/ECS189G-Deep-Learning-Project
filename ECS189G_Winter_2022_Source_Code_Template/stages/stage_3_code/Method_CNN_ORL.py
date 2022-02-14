@@ -59,7 +59,7 @@ class Method_CNN_ORL(method, nn.Module):
         '''Forward propagation'''
 
         # Define how our input travels through the previously defined layers
-
+        #print(x.shape)
         h = self.activation_func_1(self.conv1(x))
         #print(h.shape)
         h = self.pool1(h)
@@ -76,17 +76,18 @@ class Method_CNN_ORL(method, nn.Module):
 
         #flatten the conv layer
         h = h.view(-1, 26*11*8)
-
+        #print(h.shape)
         h = self.activation_func_3(self.fc_layer_1(h))
-
+        #print(h.shape)
         h = self.activation_func_4(self.fc_layer_2(h))
-
+        #print(h.shape)
         h = self.activation_func_5(self.fc_layer_3(h))
-
+        #print(h.shape)
         h = self.activation_func_6(self.fc_layer_4(h))
-
+        #print(h.shape)
         # output layer result
         y_pred = self.activation_func_7(self.fc_layer_5(h))
+        #print(y_pred.shape)
         return y_pred
 
     # backward error propagation will be implemented by pytorch automatically

@@ -15,9 +15,9 @@ import numpy as np
 class Method_CNN_CIFAR(method, nn.Module):
     data = None
     # it defines the max rounds to train the model
-    max_epoch = 80
+    max_epoch = 200
     # it defines the learning rate for gradient descent based optimizer for model learning
-    learning_rate = 1e-3
+    learning_rate = 1e-2
 
     #initializing the model architecture
     # Conv2s( channels in, channels out, kernel size, stride)
@@ -67,9 +67,9 @@ class Method_CNN_CIFAR(method, nn.Module):
         h = self.activation_func_2(self.conv2(h))
         #print(h.shape)
         h = self.pool2(h)
-       # print(h.shape)
+        #print(h.shape)
         h = self.activation_func_3(self.conv3(h))
-        # print(h.shape)
+        #print(h.shape)
         h = self.pool3(h)
         #print(h.shape)
 
@@ -78,17 +78,18 @@ class Method_CNN_CIFAR(method, nn.Module):
 
         #flatten the conv layer
         h = h.view(-1, 24*4*4)
-
+        #print(h.shape)
         h = self.activation_func_3(self.fc_layer_1(h))
-
+        #print(h.shape)
         h = self.activation_func_3(self.fc_layer_2(h))
-
+        #print(h.shape)
         h = self.activation_func_3(self.fc_layer_3(h))
-
+        #print(h.shape)
         h = self.activation_func_6(self.fc_layer_4(h))
-
+        #print(h.shape)
         # output layer result
         y_pred = self.activation_func_7(self.fc_layer_5(h))
+        #print(y_pred.shape)
         return y_pred
 
     # backward error propagation will be implemented by pytorch automatically
@@ -126,7 +127,7 @@ class Method_CNN_CIFAR(method, nn.Module):
             # update the variables according to the optimizer and the gradients calculated by the above loss.backward function
             optimizer.step()
 
-            if epoch % 16 == 0:
+            if epoch % 25 == 0:
                 accuracy_evaluator.data = {'true_y': y_true, 'pred_y': y_pred.max(1)[1]}
                 print('Epoch:', epoch, 'Metrics:', accuracy_evaluator.evaluate(), 'Loss:', train_loss.item())
 
