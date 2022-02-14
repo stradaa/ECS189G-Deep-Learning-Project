@@ -15,7 +15,7 @@ import numpy as np
 class Method_CNN(method, nn.Module):
     data = None
     # it defines the max rounds to train the model
-    max_epoch = 20
+    max_epoch = 100
     # it defines the learning rate for gradient descent based optimizer for model learning
     learning_rate = 1e-3
 
@@ -33,14 +33,17 @@ class Method_CNN(method, nn.Module):
         self.activation_func_2 = nn.LeakyReLU()
         self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.fc_layer_1 = nn.Linear(192, 100)
+        self.fc_layer_1 = nn.Linear(192, 120)
         self.activation_func_3 = nn.LeakyReLU()
 
-        self.fc_layer_2 = nn.Linear(100, 50)
+        self.fc_layer_2 = nn.Linear(120, 80)
         self.activation_func_4 = nn.LeakyReLU()
 
-        self.fc_layer_3 = nn.Linear(50, 10)
-        self.activation_func_5 = nn.Softmax(dim=1)
+        self.fc_layer_3 = nn.Linear(80, 40)
+        self.activation_func_5 = nn.LeakyReLU()
+
+        self.fc_layer_4 = nn.Linear(40, 10)
+        self.activation_func_6 = nn.Softmax(dim=1)
 
     # it defines the forward propagation function for input x
     # this function will calculate the output layer by layer
@@ -65,8 +68,10 @@ class Method_CNN(method, nn.Module):
 
         h = self.activation_func_4(self.fc_layer_2(h))
 
+        h = self.activation_func_5(self.fc_layer_3(h))
+
         # output layer result
-        y_pred = self.activation_func_5(self.fc_layer_3(h))
+        y_pred = self.activation_func_6(self.fc_layer_4(h))
         return y_pred
 
     # backward error propagation will be implemented by pytorch automatically
@@ -103,7 +108,7 @@ class Method_CNN(method, nn.Module):
             # update the variables according to the optimizer and the gradients calculated by the above loss.backward function
             optimizer.step()
 
-            if epoch % 2 == 0:
+            if epoch % 20 == 0:
                 accuracy_evaluator.data = {'true_y': y_true, 'pred_y': y_pred.max(1)[1]}
                 print('Epoch:', epoch, 'Metrics:', accuracy_evaluator.evaluate(), 'Loss:', train_loss.item())
 
