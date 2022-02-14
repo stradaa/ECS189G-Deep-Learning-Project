@@ -33,10 +33,10 @@ class Method_CNN(method, nn.Module):
         self.activation_func_2 = nn.LeakyReLU()
         self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.fc_layer_1 = nn.Linear(1, 11)
+        self.fc_layer_1 = nn.Linear(4, 15)
         self.activation_func_3 = nn.LeakyReLU()
 
-        self.fc_layer_3 = nn.Linear(11, 10)
+        self.fc_layer_3 = nn.Linear(15, 10)
         self.activation_func_5 = nn.Softmax(dim=1)
 
     # it defines the forward propagation function for input x
