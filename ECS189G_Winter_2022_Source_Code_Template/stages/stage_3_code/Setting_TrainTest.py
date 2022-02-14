@@ -38,16 +38,15 @@ class TrainTestSplit(setting):
         test = loaded_data['test']
         X_test = []
         y_test = []
+
         for image in test:
             # extract image data and convert
             X_test.append(image['image'])
             # extract label
             y_test.append(image['label'])
 
-        X_test = torch.from_numpy(np.array(X_train))
+        X_test = torch.from_numpy(np.array(X_test))
         X_test = X_test.unsqueeze(1)
-
-
 
         # run MethodModule
         self.method.data = {'train': {'X': X_train, 'y': y_train}, 'test': {'X': X_test, 'y': y_test}}

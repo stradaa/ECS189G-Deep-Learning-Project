@@ -15,7 +15,7 @@ import numpy as np
 class Method_CNN(method, nn.Module):
     data = None
     # it defines the max rounds to train the model
-    max_epoch = 10
+    max_epoch = 20
     # it defines the learning rate for gradient descent based optimizer for model learning
     learning_rate = 1e-3
 
@@ -33,10 +33,13 @@ class Method_CNN(method, nn.Module):
         self.activation_func_2 = nn.LeakyReLU()
         self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.fc_layer_1 = nn.Linear(4, 15)
+        self.fc_layer_1 = nn.Linear(192, 100)
         self.activation_func_3 = nn.LeakyReLU()
 
-        self.fc_layer_3 = nn.Linear(15, 10)
+        self.fc_layer_2 = nn.Linear(100, 50)
+        self.activation_func_4 = nn.LeakyReLU()
+
+        self.fc_layer_3 = nn.Linear(50, 10)
         self.activation_func_5 = nn.Softmax(dim=1)
 
     # it defines the forward propagation function for input x
@@ -47,25 +50,23 @@ class Method_CNN(method, nn.Module):
 
         # Define how our input travels through the previously defined layers
 
-        print("conv1: -----------------")
-        print(x.shape)
         h = self.activation_func_1(self.conv1(x))
-        print(h.shape)
-        print("pool_1:")
+
         h = self.pool1(h)
-        print(h.shape)
-        print("conv2: ")
+
         h = self.activation_func_2(self.conv2(h))
+
         h = self.pool2(h)
 
-        print("fc_layer1:")
+        #flatten the conv layer
+        h = h.view(-1, 12*4*4)
+
         h = self.activation_func_3(self.fc_layer_1(h))
 
-        print("output layer:")
+        h = self.activation_func_4(self.fc_layer_2(h))
+
         # output layer result
         y_pred = self.activation_func_5(self.fc_layer_3(h))
-        print(y_pred[0])
-        print("------------------")
         return y_pred
 
     # backward error propagation will be implemented by pytorch automatically
@@ -85,14 +86,11 @@ class Method_CNN(method, nn.Module):
         # you can try to split X and y into smaller-sized batches by yourself
         for epoch in range(self.max_epoch):  # you can do an early stop if self.max_epoch is too much...
 
-            # get the output, we need to covert X into torch.tensor so pytorch algorithm can operate on it
             optimizer.zero_grad()
 
-            print("here")
             y_pred = self.forward(torch.FloatTensor(np.array(X)))
 
             # convert y to torch.tensor as well
-            print("here2")
             y_true = torch.LongTensor(np.array(y))
             # calculate the training loss
             train_loss = loss_function(y_pred, y_true)
