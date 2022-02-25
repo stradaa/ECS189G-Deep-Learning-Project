@@ -119,6 +119,18 @@ class Dataset_Loader(DS):
         fields = {'Label': LABEL, 'words': TEXT}
 
         train_ds = DataFrameDataset(df_train, fields)
+        test_ds = DataFrameDataset(df_test, fields)
 
         train_data, valid_data = train_ds.split(random_state=random.seed(SEED))
+
+        BATCH_SIZE = 64
+
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+        train_iterator, valid_iterator, test_iterator = data.BucketIterator.splits(
+            (train_data, valid_data, test_ds),
+            batch_size=BATCH_SIZE,
+            device=device)
+
+        return TEXT, LABEL, train_iterator, valid_iterator, test_iterator
 

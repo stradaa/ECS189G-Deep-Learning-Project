@@ -35,10 +35,7 @@ if 1:
     train_dict = pickle.load(open('train_pickle', 'rb'))
     test_dict = pickle.load(open('test_pickle', 'rb'))
 
-    out = data_obj_train.word_embedding(train_dict, test_dict)
-
-    # df1 = pd.DataFrame(train_dict['pos'], columns=['words'])
-    # df2 = pd.DataFrame(train_dict['neg'], columns=['words'])
+    TEXT, LABEL, train_iterator, valid_iterator, test_iterator = data_obj_train.word_embedding(train_dict, test_dict)
 
     # method_obj = RNN('CNN', '')
 
