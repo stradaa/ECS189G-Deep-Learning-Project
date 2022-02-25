@@ -1,7 +1,10 @@
 from stages.stage_4_code.Dataset_Loader import Dataset_Loader
 from stages.stage_4_code.Method_RNN import RNN
 import numpy as np
+import pickle
 import torch
+import pandas as pd
+
 
 if 1:
     # ---- parameter section -------------------------------
@@ -16,16 +19,24 @@ if 1:
                                                 r'data/stage_4_data/text_classification/'
     data_obj_train.dataset_source_file_name = ''
 
-    data = data_obj_train.load()
+    data = data_obj_train.load2()
 
-    train_data_pos = data[0]
-    train_data_neg = data[1]
+    # #
+    # train_dict = data[0]
+    # test_dict = data[1]
+    #
+    # pickle_out = open("train_pickle", 'wb')
+    # pickle_out2 = open("test_pickle", 'wb')
+    # pickle.dump(train_dict, pickle_out)
+    # pickle.dump(test_dict, pickle_out2)
+    # pickle_out.close()
+    # pickle_out2.close()
 
-    print(train_data_pos.values())
-    print(train_data_neg.values())
+    # train_dict = pickle.load(open('train_pickle', 'rb'))
+    # test_dict = pickle.load(open('test_pickle', 'rb'))
 
-    # results = data_obj_train.word_embedding(train_data, test_data)
-    # print(results[0].vocab.freqs.most_common(20))
+    # df1 = pd.DataFrame(train_dict['pos'], columns=['words'])
+    # df2 = pd.DataFrame(train_dict['neg'], columns=['words'])
 
     # method_obj = RNN('CNN', '')
 
