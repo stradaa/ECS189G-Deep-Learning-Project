@@ -19,7 +19,7 @@ if 1:
                                                 r'data/stage_4_data/text_classification/'
     data_obj_train.dataset_source_file_name = ''
 
-    data = data_obj_train.load2()
+    # data = data_obj_train.load2()
 
     # #
     # train_dict = data[0]
@@ -32,8 +32,10 @@ if 1:
     # pickle_out.close()
     # pickle_out2.close()
 
-    # train_dict = pickle.load(open('train_pickle', 'rb'))
-    # test_dict = pickle.load(open('test_pickle', 'rb'))
+    train_dict = pickle.load(open('train_pickle', 'rb'))
+    test_dict = pickle.load(open('test_pickle', 'rb'))
+
+    out = data_obj_train.word_embedding(train_dict, test_dict)
 
     # df1 = pd.DataFrame(train_dict['pos'], columns=['words'])
     # df2 = pd.DataFrame(train_dict['neg'], columns=['words'])
