@@ -19,6 +19,7 @@ import numpy as np
 import string
 import random
 
+
 # https://github.com/bentrevett/pytorch-sentiment-analysis/blob/master/1%20-%20Simple%20Sentiment%20Analysis.ipynb
 # https://github.com/bentrevett/pytorch-sentiment-analysis/blob/master/2%20-%20Upgraded%20Sentiment%20Analysis.ipynb
 
@@ -75,7 +76,6 @@ class Dataset_Loader(DS):
 
         return train_dict, test_dict
 
-
     def word_embedding(self, train_data, test_data):
         print("Starting Word Embedding")
         # Labels
@@ -131,6 +131,9 @@ class Dataset_Loader(DS):
         print(f"Unique tokens in TEXT vocabulary: {len(TEXT.vocab)}")
         print(f"Unique tokens in LABEL vocabulary: {len(LABEL.vocab)}")
 
+        print(TEXT.vocab.freqs.most_common(20))
+        print(LABEL.vocab.stoi)
+
         BATCH_SIZE = 64
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -138,7 +141,7 @@ class Dataset_Loader(DS):
         train_iterator, valid_iterator, test_iterator = data.BucketIterator.splits(
             (train_data, valid_data, test_ds),
             batch_size=BATCH_SIZE,
-            device=device)
+            device=device,
+            sort=False)
 
         return [TEXT, LABEL, train_iterator, valid_iterator, test_iterator]
-
