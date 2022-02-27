@@ -35,8 +35,9 @@ if 1:
     train_dict = pickle.load(open('train_pickle', 'rb'))
     test_dict = pickle.load(open('test_pickle', 'rb'))
 
-    TEXT, LABEL, train_iterator, valid_iterator, test_iterator = data_obj_train.word_embedding(train_dict, test_dict)
+    word_embedding_results = data_obj_train.word_embedding(train_dict, test_dict)
 
+    # print(word_embedding_results[2])
     # method_obj = RNN('CNN', '')
 
     # result_obj = Result_Saver('saver', '')
