@@ -19,6 +19,7 @@ import numpy as np
 import string
 import random
 
+
 # https://github.com/bentrevett/pytorch-sentiment-analysis/blob/master/1%20-%20Simple%20Sentiment%20Analysis.ipynb
 # https://github.com/bentrevett/pytorch-sentiment-analysis/blob/master/2%20-%20Upgraded%20Sentiment%20Analysis.ipynb
 
@@ -75,7 +76,6 @@ class Dataset_Loader(DS):
 
         return train_dict, test_dict
 
-
     def word_embedding(self, train_data, test_data):
         print("Starting Word Embedding")
         # Labels
@@ -113,15 +113,26 @@ class Dataset_Loader(DS):
 
         TEXT = data.Field(tokenize='spacy',
                           tokenizer_language='en_core_web_sm')
-        TEXT.build_vocab(df_train, max_size=25000, vectors="glove.6B.100d")
         LABEL = data.LabelField(dtype=torch.float)
-        LABEL.build_vocab(df_train)
         fields = {'Label': LABEL, 'words': TEXT}
 
         train_ds = DataFrameDataset(df_train, fields)
         test_ds = DataFrameDataset(df_test, fields)
 
         train_data, valid_data = train_ds.split(random_state=random.seed(SEED))
+
+        print(f'Number of training examples: {len(train_data)}')
+        print(f'Number of validation examples: {len(valid_data)}')
+        print(f'Number of testing examples: {len(test_ds)}')
+
+        TEXT.build_vocab(train_data, max_size=25000, vectors="glove.6B.100d")
+        LABEL.build_vocab(train_data)
+
+        print(f"Unique tokens in TEXT vocabulary: {len(TEXT.vocab)}")
+        print(f"Unique tokens in LABEL vocabulary: {len(LABEL.vocab)}")
+
+        print(TEXT.vocab.freqs.most_common(20))
+        print(LABEL.vocab.stoi)
 
         BATCH_SIZE = 64
 
@@ -130,7 +141,7 @@ class Dataset_Loader(DS):
         train_iterator, valid_iterator, test_iterator = data.BucketIterator.splits(
             (train_data, valid_data, test_ds),
             batch_size=BATCH_SIZE,
-            device=device)
+            device=device,
+            sort=False)
 
-        return TEXT, LABEL, train_iterator, valid_iterator, test_iterator
-
+        return [TEXT, LABEL, train_iterator, valid_iterator, test_iterator]

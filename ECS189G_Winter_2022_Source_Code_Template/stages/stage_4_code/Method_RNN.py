@@ -1,33 +1,21 @@
 import torch.nn as nn
 import torch
+import time
 
 
 class RNN(nn.Module):
-
-    INPUT_DIM = None
-    EMBEDDING_DIM = 100
-    HIDDEN_DIM = 256
-    OUTPUT_DIM = 1
-
-
-    def __init__(self, vocab_size, embedding_dim, hidden_dim, output_dim, n_layers,
-                 bidirectional, dropout, pad_idx):
+    def __init__(self, input_dim, embedding_dim, hidden_dim, output_dim):
 
         super().__init__()
 
-        self.embedding = nn.Embedding(vocab_size, embedding_dim, padding_idx=pad_idx)
+        self.embedding = nn.Embedding(input_dim, embedding_dim)
 
-        self.rnn = nn.LSTM(embedding_dim,
-                           hidden_dim,
-                           num_layers=n_layers,
-                           bidirectional=bidirectional,
-                           dropout=dropout)
+        self.rnn = nn.RNN(embedding_dim, hidden_dim)
 
-        self.fc = nn.Linear(hidden_dim * 2, output_dim)
-
-        self.dropout = nn.Dropout(dropout)
+        self.fc = nn.Linear(hidden_dim, output_dim)
 
     def forward(self, text):
+
         # text = [sent len, batch size]
 
         embedded = self.embedding(text)
@@ -42,6 +30,15 @@ class RNN(nn.Module):
         assert torch.equal(output[-1, :, :], hidden.squeeze(0))
 
         return self.fc(hidden.squeeze(0))
+
+    def count_parameters(model):
+        return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+    def epoch_time(start_time, end_time):
+        elapsed_time = end_time - start_time
+        elapsed_mins = int(elapsed_time / 60)
+        elapsed_secs = int(elapsed_time - (elapsed_mins * 60))
+        return elapsed_mins, elapsed_secs
 
     def binary_accuracy(preds, y):
         """
@@ -58,7 +55,7 @@ class RNN(nn.Module):
         epoch_loss = 0
         epoch_acc = 0
 
-        model.train()
+        # model.train()
 
         for batch in iterator:
             optimizer.zero_grad()
