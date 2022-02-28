@@ -111,7 +111,8 @@ class Dataset_Loader(DS):
         torch.backends.cudnn.deterministic = True
 
         TEXT = data.Field(tokenize='spacy',
-                          tokenizer_language='en_core_web_sm')
+                          tokenizer_language='en_core_web_sm',
+                          include_lengths=True)
         LABEL = data.LabelField(dtype=torch.float)
         fields = {'Label': LABEL, 'words': TEXT}
 
@@ -151,6 +152,7 @@ class Dataset_Loader(DS):
             (train_data, valid_data, test_ds),
             batch_size=BATCH_SIZE,
             device=device,
+            sort_key=lambda x: len(x.words),
             sort_within_batch=True)
 
         return [TEXT, LABEL, train_iterator, valid_iterator, test_iterator]

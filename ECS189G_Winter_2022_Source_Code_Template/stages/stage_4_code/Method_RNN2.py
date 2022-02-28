@@ -29,7 +29,7 @@ class RNN(nn.Module):
 
         # pack sequence
         # lengths need to be on CPU!
-        packed_embedded = nn.utils.rnn.pack_padded_sequence(embedded, text_lengths, batch_first=True)
+        packed_embedded = nn.utils.rnn.pack_padded_sequence(embedded, text_lengths.to('cpu')) #batch_first=True)
 
         packed_output, (hidden, cell) = self.rnn(packed_embedded)
 
@@ -69,14 +69,13 @@ class RNN(nn.Module):
         for batch in iterator:
             optimizer.zero_grad()
 
-            text = batch.words
-            text_lengths = torch.as_tensor([64, 1], dtype=torch.int64, device='cpu')
+            text, text_lengths = batch.words
 
             predictions = model(text, text_lengths).squeeze(1)
 
             loss = criterion(predictions, batch.Label)
 
-            acc = binary_accuracy(predictions, batch.Label)
+            acc = RNN.binary_accuracy(predictions, batch.Label)
 
             loss.backward()
 
@@ -92,8 +91,6 @@ class RNN(nn.Module):
         epoch_loss = 0
         epoch_acc = 0
 
-        # model.eval()
-
         with torch.no_grad():
             for batch in iterator:
                 text, text_lengths = batch.words
@@ -102,7 +99,7 @@ class RNN(nn.Module):
 
                 loss = criterion(predictions, batch.Label)
 
-                acc = binary_accuracy(predictions, batch.Label)
+                acc = RNN.binary_accuracy(predictions, batch.Label)
 
                 epoch_loss += loss.item()
                 epoch_acc += acc.item()
