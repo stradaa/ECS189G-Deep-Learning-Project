@@ -20,8 +20,8 @@ import string
 import random
 
 
-# https://github.com/bentrevett/pytorch-sentiment-analysis/blob/master/1%20-%20Simple%20Sentiment%20Analysis.ipynb
 # https://github.com/bentrevett/pytorch-sentiment-analysis/blob/master/2%20-%20Upgraded%20Sentiment%20Analysis.ipynb
+# this method attempts to perform bidirectional RNN
 
 
 class Dataset_Loader(DS):
@@ -105,7 +105,6 @@ class Dataset_Loader(DS):
         df_train = pd.concat([df_train_data_pos, df_train_data_neg], ignore_index=True)
         df_test = pd.concat([df_test_data_pos, df_test_data_neg], ignore_index=False)
 
-        # print(df_train.head())
         SEED = 1234
 
         torch.manual_seed(SEED)
@@ -125,7 +124,9 @@ class Dataset_Loader(DS):
         print(f'Number of validation examples: {len(valid_data)}')
         print(f'Number of testing examples: {len(test_ds)}')
 
-        TEXT.build_vocab(train_data, max_size=25000, vectors="glove.6B.100d")
+        TEXT.build_vocab(train_data, max_size=25000,
+                         vectors="glove.6B.100d",
+                         unk_init=torch.Tensor.normal_)
         LABEL.build_vocab(train_data)
 
         print(f"Unique tokens in TEXT vocabulary: {len(TEXT.vocab)}")
@@ -138,10 +139,18 @@ class Dataset_Loader(DS):
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+        # for SGD RNN
+        # train_iterator, valid_iterator, test_iterator = data.BucketIterator.splits(
+        #     (train_data, valid_data, test_ds),
+        #     batch_size=BATCH_SIZE,
+        #     device=device,
+        #     sort=False)
+
+        # for RNN2 (bidirectional)
         train_iterator, valid_iterator, test_iterator = data.BucketIterator.splits(
             (train_data, valid_data, test_ds),
             batch_size=BATCH_SIZE,
             device=device,
-            sort=False)
+            sort_within_batch=True)
 
         return [TEXT, LABEL, train_iterator, valid_iterator, test_iterator]

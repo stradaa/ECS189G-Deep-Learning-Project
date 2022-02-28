@@ -31,15 +31,6 @@ class RNN(nn.Module):
 
         return self.fc(hidden.squeeze(0))
 
-    def count_parameters(model):
-        return sum(p.numel() for p in model.parameters() if p.requires_grad)
-
-    def epoch_time(start_time, end_time):
-        elapsed_time = end_time - start_time
-        elapsed_mins = int(elapsed_time / 60)
-        elapsed_secs = int(elapsed_time - (elapsed_mins * 60))
-        return elapsed_mins, elapsed_secs
-
     def binary_accuracy(preds, y):
         """
         Returns accuracy per batch, i.e. if you get 8/10 right, this returns 0.8, NOT 8
@@ -52,6 +43,7 @@ class RNN(nn.Module):
         return acc
 
     def train(model, iterator, optimizer, criterion):
+
         epoch_loss = 0
         epoch_acc = 0
 
@@ -60,11 +52,11 @@ class RNN(nn.Module):
         for batch in iterator:
             optimizer.zero_grad()
 
-            predictions = model(batch.text).squeeze(1)
+            predictions = model(batch.words).squeeze(1)
 
-            loss = criterion(predictions, batch.label)
+            loss = criterion(predictions, batch.Label)
 
-            acc = RNN.binary_accuracy(predictions, batch.label)
+            acc = binary_accuracy(predictions, batch.Label)
 
             loss.backward()
 
@@ -80,17 +72,23 @@ class RNN(nn.Module):
         epoch_loss = 0
         epoch_acc = 0
 
-        model.eval()
+        # model.eval()
 
         with torch.no_grad():
             for batch in iterator:
-                predictions = model(batch.text).squeeze(1)
+                predictions = model(batch.words).squeeze(1)
 
-                loss = criterion(predictions, batch.label)
+                loss = criterion(predictions, batch.Label)
 
-                acc = binary_accuracy(predictions, batch.label)
+                acc = binary_accuracy(predictions, batch.Label)
 
                 epoch_loss += loss.item()
                 epoch_acc += acc.item()
 
         return epoch_loss / len(iterator), epoch_acc / len(iterator)
+
+    def epoch_time(start_time, end_time):
+        elapsed_time = end_time - start_time
+        elapsed_mins = int(elapsed_time / 60)
+        elapsed_secs = int(elapsed_time - (elapsed_mins * 60))
+        return elapsed_mins, elapsed_secs
