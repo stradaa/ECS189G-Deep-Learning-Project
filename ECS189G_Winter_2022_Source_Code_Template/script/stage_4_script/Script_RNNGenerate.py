@@ -97,9 +97,7 @@ if 1:
     optimizer = optim.SGD(model.parameters(), lr=1e-3)
     criterion = nn.BCEWithLogitsLoss()
 
-    iterator, optimizer, criterion, jokes, jokes_size, vocab_words, vocab_index, context, next
-    model, word_embedding_results[2], optimizer, criterion
-    model.train()
+    # model.train()
 
 
     # def count_parameters(model):
