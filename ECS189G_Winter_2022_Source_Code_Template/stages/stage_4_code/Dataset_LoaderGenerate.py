@@ -56,6 +56,7 @@ class Dataset_Loader(DS):
             self.vocab_index[i] = word[0]
         context = []
         next = []
+
         for joke in jokes:
             encoded_joke = [self.vocab_words[word] for word in joke]
             for i in range(len(encoded_joke) - 3):

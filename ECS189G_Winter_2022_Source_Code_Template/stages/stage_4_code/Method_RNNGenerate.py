@@ -84,15 +84,22 @@ class RNN(nn.Module):
         elapsed_secs = int(elapsed_time - (elapsed_mins * 60))
         return elapsed_mins, elapsed_secs
 
-    def binary_accuracy(preds, y):
+    def binary_accuracy(model, context, next):
         """
         Returns accuracy per batch, i.e. if you get 8/10 right, this returns 0.8, NOT 8
         """
-
+        preds = []
+        y = []
         # round predictions to the closest integer
-
-        rounded_preds = torch.round(torch.sigmoid(preds))
-        correct = (rounded_preds == y).float()  # convert into float for division
+        for i in range(len(context)):
+            ct = torch.LongTensor(context[i])
+            n = torch.LongTensor(next[i])
+            pred = model(ct)
+            preds.append(pred)
+            y.append(n)
+        predsT = torch.LongTensor(preds)
+        yT = torch.LongTensor(y)
+        correct = (predsT == yT).float()  # convert into float for division
         acc = correct.sum() / len(correct)
         return acc
 

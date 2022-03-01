@@ -130,6 +130,8 @@ if 1:
             optimizer.step()
 
             print("Epoch:  %d, loss: %.5f " %(epoch, loss.item()))
+        acc = model.binary_accuracy(model, context, next)
+        print("Epoch:  %d, accuracy: %.5f " %(epoch, acc))
         loss_vals.append(sum(loss_epoch) / len(loss_epoch))
 
     plt.plot(np.linspace(1, N_EPOCHS, N_EPOCHS).astype(int), loss_vals)
