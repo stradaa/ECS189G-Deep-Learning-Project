@@ -14,7 +14,9 @@ class RNN(nn.Module):
         self.input_dim = len(vocab_words)
         self.output_dim = len(vocab_words)
         self.dropout = nn.Dropout(0.25)
-        self.embedding = nn.Embedding(self.input_dim, self.embedding_dim)
+
+        # Embedding
+        self.embedding = nn.Embedding(self.input_dim, self.hidden_dim)
 
         # Bi-LSTM
         self.lstm_forward = nn.LSTMCell(hidden_dim, hidden_dim)
@@ -66,9 +68,9 @@ class RNN(nn.Module):
         # lstm cell
         for fwd, bwd in zip(forward, back):
             input_tensor = torch.cat((fwd, bwd), 1)
-            hs_lstm, cs_lstm = self.lstm(input_tensor, (hs_cell, cs_cell))
+            hs_cell, cs_cell = self.lstm(input_tensor, (hs_cell, cs_cell))
 
-        out = self.fc(hs_lstm)
+        out = self.fc(hs_cell)
         return out
 
 

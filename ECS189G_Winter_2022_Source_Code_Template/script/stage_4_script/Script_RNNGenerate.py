@@ -5,8 +5,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as func
-import pandas as pd
-import time
+import matplotlib.pyplot as plt
 
 #
 # def binary_accuracy(preds, y):
@@ -78,24 +77,21 @@ import time
 # https://github.com/FernandoLpz/Text-Generation-BiLSTM-PyTorch
 
 
-def predict(md, seq, v_index, n_words):
+def predict(md, seq, v_index, v_words, n_words, pattern):
     softmax = nn.Softmax(dim=1)
-    start = np.random.randint(0, len(seq)-1)
-    pattern = seq[start]
 
-    print("Pattern: ")
-    print(''.join(v_index[value] for value in pattern))
-
-    final = pattern.copy()
-
+    final = pattern
+    encoded_pattern = []
+    for word in pattern:
+        encoded_pattern.append(v_words[word])
+    pattern = encoded_pattern
     for i in range(n_words):
         pattern = torch.LongTensor(pattern)
         pattern = pattern.view(1,-1)
 
         prediction = md(pattern)
         prediction = softmax(prediction)
-        prediction = prediction.squeeze\
-            ().detach().numpy()
+        prediction = prediction.squeeze().detach().numpy()
         most_likely = np.argmax(prediction)
 
         pattern = pattern.squeeze().detach().numpy()
@@ -130,13 +126,15 @@ if 1:
     # OUTPUT_DIM = 1
 
     model = RNN(EMBEDDING_DIM, HIDDEN_DIM, vocab_words, BATCH_SIZE)
-    optimizer = optim.SGD(model.parameters(), lr=1e-3)
+    optimizer = optim.SGD(model.parameters(), lr=1e-2)
     criterion = nn.BCEWithLogitsLoss()
     n_batches = int(len(context)/model.batch_size)
 
-    for epoch in range(N_EPOCHS):
-        for i in range(n_batches):
+    loss_vals = []
 
+    for epoch in range(N_EPOCHS):
+        loss_epoch = []
+        for i in range(n_batches):
             try:
                 x_batch = context[i * model.batch_size : (i+1) * model.batch_size]
                 y_batch = next[i * model.batch_size : (i+1) * model.batch_size]
@@ -148,6 +146,7 @@ if 1:
             y = torch.LongTensor(y_batch)
 
             # calc prediction, loss, gradients
+            loss_epoch.append(loss.item())
             pred = model(x)
             loss = func.cross_entropy(pred, y.squeeze())
             optimizer.zero_grad()
@@ -155,10 +154,12 @@ if 1:
             optimizer.step()
 
             print("Epoch:  %d, loss: %.5f " %(epoch, loss.item()))
+        loss_vals.append(sum(loss_epoch) / len(loss_epoch))
 
-    #torch.save(model.state_dict((), 'weights/RNNGenerate.pt'))
+    plt.plot(np.linspace(1, N_EPOCHS, N_EPOCHS).astype(int), loss_vals)
+    plt.show()
 
-    predict(model, context, vocab_index, len(vocab_words))
+    predict(model, context, vocab_index, vocab_words, 25, "There was a ")
 
 
 
