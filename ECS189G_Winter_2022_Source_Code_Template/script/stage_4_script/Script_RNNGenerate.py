@@ -80,7 +80,7 @@ import time
 
 def predict(md, seq, v_index, n_words):
     softmax = nn.Softmax(dim=1)
-    start = np.random.randint(0, len(seq-1))
+    start = np.random.randint(0, len(seq)-1)
     pattern = seq[start]
 
     print("Pattern: ")
