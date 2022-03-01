@@ -46,11 +46,8 @@ class Dataset_Loader(DS):
                 joke = buff.split(',',1)[1].replace("\n", "").lower().split()
                 jokes.append(joke)
                 jokes_size.append(len(joke))
-        # print(jokes)
         words = list(itertools.chain.from_iterable(jokes))
         word_count = collections.Counter(words).most_common()
-        # print(word_count)
-        # word_count = Counter(words).most_common()
         for i, word in enumerate(word_count):
             self.vocab_words[word[0]] = i
             self.vocab_index[i] = word[0]
@@ -61,12 +58,7 @@ class Dataset_Loader(DS):
             for i in range(len(encoded_joke) - 3):
                 context.append(encoded_joke[i:i+3])
                 next.append(encoded_joke[i+3])
-        # print("jokes:", jokes)
-        # print("[[self.vocab_index[ind] for ind in joke] for joke in context]: ", [[self.vocab_index[ind] for ind in joke] for joke in context])
-        # print("next:", next)
         print([self.vocab_index[ind] for ind in next])
-        # print("context", context)
-        # print("next", next)
 
         return jokes, jokes_size, self.vocab_words, self.vocab_index, context, next
 
