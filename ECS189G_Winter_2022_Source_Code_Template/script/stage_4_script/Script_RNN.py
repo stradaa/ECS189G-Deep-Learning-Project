@@ -83,9 +83,9 @@ if 1:
 
     # ---- objection initialization section ---------------
     data_obj_train = Dataset_Loader('stage_4_data')
-    data_obj_train.dataset_source_folder_path = r'C:/Users/Alex Estrada/PycharmProjects/ECS189G/' \
+    data_obj_train.dataset_source_folder_path = r'C:\Users\Sean H\Documents\ecs189' \
                                                 r'ECS189G_Winter_2022_Source_Code_Template/' \
-                                                r'data/stage_4_data/text_classification/'
+                                                r'data\stage_4_data\text_classification'
     data_obj_train.dataset_source_file_name = ''
 
     # data = data_obj_train.load2()
