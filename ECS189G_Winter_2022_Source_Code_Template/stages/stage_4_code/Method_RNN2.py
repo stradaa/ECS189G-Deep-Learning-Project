@@ -111,3 +111,16 @@ class RNN(nn.Module):
         elapsed_mins = int(elapsed_time / 60)
         elapsed_secs = int(elapsed_time - (elapsed_mins * 60))
         return elapsed_mins, elapsed_secs
+
+    nlp = spacy.load('en_core_web_sm')
+
+    def predict_sentiment(model, sentence):
+        model.eval()
+        tokenized = [tok.text for tok in nlp.tokenizer(sentence)]
+        indexed = [TEXT.vocab.stoi[t] for t in tokenized]
+        length = [len(indexed)]
+        tensor = torch.LongTensor(indexed).to(device)
+        tensor = tensor.unsqueeze(1)
+        length_tensor = torch.LongTensor(length)
+        prediction = torch.sigmoid(model(tensor, length_tensor))
+        return prediction.item()

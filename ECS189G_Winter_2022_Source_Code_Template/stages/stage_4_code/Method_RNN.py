@@ -56,7 +56,7 @@ class RNN(nn.Module):
 
             loss = criterion(predictions, batch.Label)
 
-            acc = binary_accuracy(predictions, batch.Label)
+            acc = RNN.binary_accuracy(predictions, batch.Label)
 
             loss.backward()
 
@@ -80,7 +80,7 @@ class RNN(nn.Module):
 
                 loss = criterion(predictions, batch.Label)
 
-                acc = binary_accuracy(predictions, batch.Label)
+                acc = RNN.binary_accuracy(predictions, batch.Label)
 
                 epoch_loss += loss.item()
                 epoch_acc += acc.item()

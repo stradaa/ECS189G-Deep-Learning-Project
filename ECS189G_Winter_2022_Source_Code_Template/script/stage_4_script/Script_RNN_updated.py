@@ -69,12 +69,12 @@ if 1:
     model = model.to(device)
     criterion = criterion.to(device)
 
-    N_EPOCHS = 5
+    N_EPOCHS = 8
 
     best_valid_loss = float('inf')
-
+    print("START TRAINING")
     for epoch in range(N_EPOCHS):
-        print("START TRAINING")
+
         start_time = time.time()
 
         train_loss, train_acc = RNN.train(model, word_embedding_results[2], optimizer, criterion)
@@ -95,3 +95,9 @@ if 1:
         print(f'\tTrain Loss: {train_loss:.3f} | Train Acc: {train_acc * 100:.2f}%')
         print(f'\t Val. Loss: {valid_loss:.3f} |  Val. Acc: {valid_acc * 100:.2f}%')
 
+    # Results
+    model.load_state_dict(torch.load('tut1-model.pt'))
+    test_loss, test_acc = RNN.evaluate(model, word_embedding_results[4], criterion)
+    print(f'Test Loss: {test_loss:.3f} | Test Acc: {test_acc * 100:.2f}%')
+
+    RNN.predict_sentiment(model, "This film is terrible")
