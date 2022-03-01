@@ -1,6 +1,7 @@
 import torch.nn as nn
 from stages.base_class.method import method
 import torch
+import numpy as np
 
 
 class RNN(nn.Module):
@@ -89,10 +90,25 @@ class RNN(nn.Module):
         """
 
         # round predictions to the closest integer
+
         rounded_preds = torch.round(torch.sigmoid(preds))
         correct = (rounded_preds == y).float()  # convert into float for division
         acc = correct.sum() / len(correct)
         return acc
+
+    def predict(model, v_words, v_index, text, next_words=25):
+
+        words = text.split(' ')
+
+        for i in range(0, next_words):
+            x = torch.tensor([[v_index[w] for w in words[i:]]])
+            y_pred = model(x)
+            last_word_logits = y_pred[0][-1]
+            p = torch.nn.functional.softmax(last_word_logits, dim=0).detach().numpy()
+            word_index = np.random.choice(len(last_word_logits), p=p)
+            words.append(v_words[word_index])
+
+        print(words)
 
     """
     def train(model, iterator, optimizer, criterion, jokes, jokes_size, vocab_words, vocab_index, context, next):

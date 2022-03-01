@@ -77,31 +77,7 @@ import matplotlib.pyplot as plt
 # https://github.com/FernandoLpz/Text-Generation-BiLSTM-PyTorch
 
 
-def predict(md, seq, v_index, v_words, n_words, pattern):
-    softmax = nn.Softmax(dim=1)
 
-    final = pattern
-    encoded_pattern = []
-    for word in pattern:
-        encoded_pattern.append(v_words[word])
-    pattern = encoded_pattern
-    for i in range(n_words):
-        pattern = torch.LongTensor(pattern)
-        pattern = pattern.view(1,-1)
-
-        prediction = md(pattern)
-        prediction = softmax(prediction)
-        prediction = prediction.squeeze().detach().numpy()
-        most_likely = np.argmax(prediction)
-
-        pattern = pattern.squeeze().detach().numpy()
-        pattern = pattern[1:]
-        pattern = np.append(pattern, most_likely)
-
-        final = np.append(final, most_likely)
-
-    print("Prediction: ")
-    print(''.join([v_index[value] for value in final]), "\"")
 
 
 
@@ -146,9 +122,9 @@ if 1:
             y = torch.LongTensor(y_batch)
 
             # calc prediction, loss, gradients
-            loss_epoch.append(loss.item())
             pred = model(x)
             loss = func.cross_entropy(pred, y.squeeze())
+            loss_epoch.append(loss.item())
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -159,7 +135,8 @@ if 1:
     plt.plot(np.linspace(1, N_EPOCHS, N_EPOCHS).astype(int), loss_vals)
     plt.show()
 
-    predict(model, context, vocab_index, vocab_words, 25, "There was a ")
+    model.predict(model, vocab_words, vocab_index, "There was a")
+    model.predict(model, vocab_words, vocab_index, "Knock Knock. Who's")
 
 
 
