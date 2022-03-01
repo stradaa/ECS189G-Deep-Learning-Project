@@ -64,7 +64,7 @@ class Dataset_Loader(DS):
         # print("jokes:", jokes)
         # print("[[self.vocab_index[ind] for ind in joke] for joke in context]: ", [[self.vocab_index[ind] for ind in joke] for joke in context])
         # print("next:", next)
-        print([self.vocab_index[ind] for ind in next])
+        # print([self.vocab_index[ind] for ind in next])
         # print("context", context)
         # print("next", next)
 

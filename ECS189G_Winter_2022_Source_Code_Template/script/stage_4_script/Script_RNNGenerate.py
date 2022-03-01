@@ -1,10 +1,10 @@
-from stages.stage_4_code.Dataset_LoaderGeneration import Dataset_Loader
-from stages.stage_4_code.Method_RNN import RNN
+from stages.stage_4_code.Dataset_LoaderGenerate import Dataset_Loader
+from stages.stage_4_code.Method_RNNGenerate import RNN
 import numpy as np
-import pickle
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import torch.nn.functional as func
 import pandas as pd
 import time
 
@@ -75,6 +75,41 @@ import time
 #     return elapsed_mins, elapsed_secs
 #
 
+# https://github.com/FernandoLpz/Text-Generation-BiLSTM-PyTorch
+
+
+def predict(md, seq, v_index, n_words):
+    softmax = nn.Softmax(dim=1)
+    start = np.random.randint(0, len(seq-1))
+    pattern = seq[start]
+
+    print("Pattern: ")
+    print(''.join(v_index[value] for value in pattern))
+
+    final = pattern.copy()
+
+    for i in range(n_words):
+        pattern = torch.LongTensor(pattern)
+        pattern = pattern.view(1,-1)
+
+        prediction = md(pattern)
+        prediction = softmax(prediction)
+        prediction = prediction.squeeze\
+            ().detach().numpy()
+        most_likely = np.argmax(prediction)
+
+        pattern = pattern.squeeze().detach().numpy()
+        pattern = pattern[1:]
+        pattern = np.append(pattern, most_likely)
+
+        final = np.append(final, most_likely)
+
+    print("Prediction: ")
+    print(''.join([v_index[value] for value in final]), "\"")
+
+
+
+
 if 1:
     # ---- parameter section -------------------------------
     np.random.seed(2)
@@ -83,21 +118,49 @@ if 1:
 
     # ---- objection initialization section ---------------
     data_obj = Dataset_Loader('stage_4_data')
-    data_obj.dataset_source_folder_path = "/Users/Gao_Owen/Documents/GitHub/ECS-189G-Project/ECS189G_Winter_2022_Source_Code_Template/data/stage_4_data/generation_data"
-    data_obj.dataset_source_file_name = ''
+    data_obj.dataset_source_folder_path = 'C:\\Users\\Sean H\\Documents\\ecs189\\ECS-189G-Project\\ECS189G_Winter_2022_Source_Code_Template\\data\\stage_4_data\\text_generation\data'
+    data_obj.dataset_source_file_name = 'data'
     jokes, jokes_size, vocab_words, vocab_index, context, next = data_obj.load()
 
     # INPUT_DIM = len(word_embedding_results[0].vocab)
-    EMBEDDING_DIM = 100
+    EMBEDDING_DIM = 256
     HIDDEN_DIM = 256
+    N_EPOCHS = 8
+    BATCH_SIZE = 17
     # OUTPUT_DIM = 1
 
-    model = RNN(EMBEDDING_DIM, HIDDEN_DIM, vocab_words)
-
+    model = RNN(EMBEDDING_DIM, HIDDEN_DIM, vocab_words, BATCH_SIZE)
     optimizer = optim.SGD(model.parameters(), lr=1e-3)
     criterion = nn.BCEWithLogitsLoss()
+    n_batches = int(len(context)/model.batch_size)
 
-    # model.train()
+    for epoch in range(N_EPOCHS):
+        for i in range(n_batches):
+
+            try:
+                x_batch = context[i * model.batch_size : (i+1) * model.batch_size]
+                y_batch = next[i * model.batch_size : (i+1) * model.batch_size]
+            except:
+                x_batch = context[i * model.batch_size:]
+                y_batch = next[i * model.batch_size:]
+
+            x = torch.LongTensor(x_batch)
+            y = torch.LongTensor(y_batch)
+
+            # calc prediction, loss, gradients
+            pred = model(x)
+            loss = func.cross_entropy(pred, y.squeeze())
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+            print("Epoch:  %d, loss: %.5f " %(epoch, loss.item()))
+
+    #torch.save(model.state_dict((), 'weights/RNNGenerate.pt'))
+
+    predict(model, context, vocab_index, len(vocab_words))
+
+
 
 
     # def count_parameters(model):

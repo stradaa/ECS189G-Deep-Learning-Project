@@ -1,38 +1,76 @@
 import torch.nn as nn
 from stages.base_class.method import method
 import torch
-import time
 
 
-class RNN(method, nn.Module):
-    def __init__(self, embedding_dim, hidden_dim, vocab_words):
+class RNN(nn.Module):
+    def __init__(self, embedding_dim, hidden_dim, vocab_words, batch_size):
 
         super().__init__()
-        self.embedding_dim = embedding_dim
+        self.batch_size = batch_size
         self.hidden_dim = hidden_dim
+        self.embedding_dim = embedding_dim
+        self.seq_size = 3
         self.input_dim = len(vocab_words)
         self.output_dim = len(vocab_words)
-
+        self.dropout = nn.Dropout(0.25)
         self.embedding = nn.Embedding(self.input_dim, self.embedding_dim)
-        self.rnn = nn.GRU(self.embedding_dim, self.hidden_dim)
-        self.fc = nn.Linear(self.hidden_dim, self.output_dim)
+
+        # Bi-LSTM
+        self.lstm_forward = nn.LSTMCell(hidden_dim, hidden_dim)
+        self.lstm_back = nn.LSTMCell(hidden_dim, hidden_dim)
+        self.lstm = nn.LSTMCell(hidden_dim*2, hidden_dim*2)
+
+        # Fully connected
+        self.fc = nn.Linear(self.hidden_dim*2, self.output_dim)
+
+
 
     def forward(self, text):
+        # initialize weights
+        hs_forward = torch.zeros(text.size(0), self.hidden_dim)
+        cs_forward = torch.zeros(text.size(0), self.hidden_dim)
+        hs_back = torch.zeros(text.size(0), self.hidden_dim)
+        cs_back = torch.zeros(text.size(0), self.hidden_dim)
 
-        # text = [sent len, batch size]
+        hs_cell = torch.zeros(text.size(0), self.hidden_dim * 2)
+        cs_cell = torch.zeros(text.size(0), self.hidden_dim * 2)
+
+        torch.nn.init.kaiming_normal_(hs_forward)
+        torch.nn.init.kaiming_normal_(cs_forward)
+        torch.nn.init.kaiming_normal_(hs_back)
+        torch.nn.init.kaiming_normal_(cs_back)
+        torch.nn.init.kaiming_normal_(hs_cell)
+        torch.nn.init.kaiming_normal_(cs_cell)
 
         embedded = self.embedding(text)
+        out = embedded.view(self.seq_size, text.size(0), -1)
 
-        # embedded = [sent len, batch size, emb dim]
+        forward = []
+        back = []
 
-        output, hidden = self.rnn(embedded)
+        # forward bilstm
+        for i in range(self.seq_size):
+            hs_forward, cs_forward = self.lstm_forward(out[i], (hs_forward, cs_forward))
+            hs_forward = self.dropout(hs_forward)
+            cs_forward = self.dropout(cs_forward)
+            forward.append(hs_forward)
 
-        # output = [sent len, batch size, hid dim]
-        # hidden = [1, batch size, hid dim]
+        # backward bilstm
+        for i in reversed(range(self.seq_size)):
+            hs_back, cs_backward = self.lstm_back(out[i], (hs_back, cs_back))
+            hs_back = self.dropout(hs_back)
+            cs_back = self.dropout(cs_back)
+            back.append(hs_back)
 
-        assert torch.equal(output[-1, :, :], hidden.squeeze(0))
+        # lstm cell
+        for fwd, bwd in zip(forward, back):
+            input_tensor = torch.cat((fwd, bwd), 1)
+            hs_lstm, cs_lstm = self.lstm(input_tensor, (hs_cell, cs_cell))
 
-        return self.fc(hidden.squeeze(0))
+        out = self.fc(hs_lstm)
+        return out
+
 
     def count_parameters(model):
         return sum(p.numel() for p in model.parameters() if p.requires_grad)
@@ -54,22 +92,29 @@ class RNN(method, nn.Module):
         acc = correct.sum() / len(correct)
         return acc
 
+    """
     def train(model, iterator, optimizer, criterion, jokes, jokes_size, vocab_words, vocab_index, context, next):
         epoch_loss = 0
         epoch_acc = 0
         X = torch.LongTensor(context)
         y = torch.LongTensor(next)
-        sentences = []
+        sentences = {}
 
+        for i in range(0, len(X), iterator):
+            yield X[i:i + iterator]
+            yield y[i:i + iterator]
 
-        for batch in iterator:
+        print("y has length " + str(len(y)))
+        print("x has length " + str(len(X)))
+
+        for batch in sentences:
             optimizer.zero_grad()
 
-            predictions = model(X).squeeze(1)
+            predictions = model(sentences[batch]).forward(1)
 
-            loss = criterion(predictions, y)
+            loss = criterion(predictions, batch)
 
-            acc = RNN.binary_accuracy(predictions, y)
+            acc = RNN.binary_accuracy(predictions, batch)
 
             loss.backward()
 
@@ -78,9 +123,9 @@ class RNN(method, nn.Module):
             epoch_loss += loss.item()
             epoch_acc += acc.item()
 
-        return epoch_loss / len(iterator), epoch_acc / len(iterator)
+        #return epoch_loss / len(iterator), epoch_acc / len(iterator)
 
-    def evaluate(model, iterator, criterion):
+    def evaluate(self, model, iterator, criterion):
 
         epoch_loss = 0
         epoch_acc = 0
@@ -93,12 +138,13 @@ class RNN(method, nn.Module):
 
                 loss = criterion(predictions, batch.label)
 
-                acc = binary_accuracy(predictions, batch.label)
+                acc = self.binary_accuracy(predictions, batch.label)
 
                 epoch_loss += loss.item()
                 epoch_acc += acc.item()
 
         return epoch_loss / len(iterator), epoch_acc / len(iterator)
+
     def generate(self, input, jokes, jokes_size, vocab_words, vocab_index):
         text = input
         joke = input + []
@@ -110,3 +156,4 @@ class RNN(method, nn.Module):
             text = text[1:] + [next]
         print("Joke:", joke)
         return joke
+    """
