@@ -130,7 +130,7 @@ if 1:
             optimizer.step()
 
             print("Epoch:  %d, loss: %.5f " %(epoch, loss.item()))
-        acc = model.binary_accuracy(model, context, next)
+        acc = model.binary_accuracy(context, next)
         print("Epoch:  %d, accuracy: %.5f " %(epoch, acc))
         loss_vals.append(sum(loss_epoch) / len(loss_epoch))
 
