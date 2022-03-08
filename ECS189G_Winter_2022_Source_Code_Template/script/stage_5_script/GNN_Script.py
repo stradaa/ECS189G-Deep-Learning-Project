@@ -1,4 +1,5 @@
 from stages.stage_5_code.Dataset_Loader_Node_Classification import Dataset_Loader
+from stages.stage_5_code.Method_GNN import Method_GCN
 import numpy as np
 import torch
 
@@ -11,16 +12,22 @@ if 1:
 
     # ---- objection initialization section ---------------
     data_obj = Dataset_Loader('stage_5_data', '')
-    data_obj.dataset_source_folder_path = '../../data/stage_5_data/'
+    data_obj.dataset_source_folder_path = '../../data/stage_5_data/cora'
+    data_obj.dataset_name = 'cora'
 
-    data_obj.dataset_source_file_name = 'training_stage_2.csv'
-    data_obj.testset_source_folder_path = '../../data/stage_5_data/citeseer'
-    data_obj.testset_source_file_name = 'testing_stage_2.csv'
+    data_test = data_obj.load() # data_test['edges']
+    # print(data_test['graph']['node'])  # length 2708 (idx_map)
+    # print(data_test['graph']['edge'])  # length 5429 (edges)
+    print(data_test['graph']['X'])    # length 2708 (features)
+    print("LENGTH FEATURES", len(data_test['graph']['X']))
+    print(data_test['graph']['y'])    # length 2708 (labels)
+    print("LENGTH LABELS", len(data_test['graph']['y']))
+
+    # print(data_test['train_test_val'])
 
 
+    method_obj = Method_GCN('graph convolution ', '')
 
-
-    # method_obj = Method_MLP('multi-layer perceptron', '')
     #
     # result_obj = Result_Saver('saver', '')
     # result_obj.result_destination_folder_path = '../../result/stage_2_result/MLP_'
