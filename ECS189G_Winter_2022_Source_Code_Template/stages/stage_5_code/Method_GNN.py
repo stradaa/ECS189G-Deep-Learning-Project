@@ -77,15 +77,8 @@ def train_step(
     preds = logits.argmax(dim=1)
     y = data.y[mask]
     loss = loss_fn(logits, y)
-    # + L2 regularization to the first layer only
-    # for name, params in model.state_dict().items():
-    #     if name.startswith("conv1"):
-    #         loss += 5e-4 * params.square().sum() / 2.0
 
     acc = accuracy(preds, y)
-
-    f1 = f1_score(preds, y, 7)
-
 
     loss.backward()
     optimizer.step()
@@ -95,20 +88,17 @@ def train_step(
 @torch.no_grad()
 def eval_step(model: torch.nn.Module, data: Data, loss_fn: LossFn, stage: Stage) -> Tuple[float, float]:
     model.eval()
+    num = 7     # num of classes
     mask = getattr(data, f"{stage}_mask")
     logits = model(data.x, data.edge_index)[mask]
     preds = logits.argmax(dim=1)
     y = data.y[mask]
     loss = loss_fn(logits, y)
-    # + L2 regularization to the first layer only
-    # for name, params in model.state_dict().items():
-    #     if name.startswith("conv1"):
-    #         loss += 5e-4 * params.square().sum() / 2.0
 
     acc = accuracy(preds, y)
-    f1 = f1_score(preds, y, 7)
-    P = precision(preds, y, 7)
-    R = recall(preds, y, 7)
+    f1 = f1_score(preds, y, num)
+    P = precision(preds, y, num)
+    R = recall(preds, y, num)
 
     return loss.item(), acc, f1, R, P
 
@@ -134,6 +124,7 @@ def train(
     verbose: bool = True,
 ) -> HistoryDict:
     history = {"loss": [], "val_loss": [], "acc": [], "val_acc": [], "f1": [], "R": [], "P": []}
+    num = 6     # num of classes -1
     for epoch in range(max_epochs):
         loss, acc = train_step(model, data, optimizer, loss_fn)
         val_loss, val_acc, f1, R, P = eval_step(model, data, loss_fn, "val")
@@ -149,7 +140,6 @@ def train(
         if epoch > early_stopping and val_loss > np.mean(history["val_loss"][-(early_stopping + 1): -1]):
             if verbose:
                 print("\nEarly stopping...")
-
             break
 
         if verbose and epoch % print_interval == 0:
@@ -163,8 +153,8 @@ def train(
         print(f"Train loss: {loss:.4f} | Train acc: {acc:.4f}")
         print(f"  Val loss: {val_loss:.4f} |   Val acc: {val_acc:.4f}")
         print(f" Test loss: {test_loss:.4f} |  Test acc: {test_acc:.4f}")
-        print("Recall:", R[6])
-        print("Precision:", P[6])
+        print("Recall:", R[num])
+        print("Precision:", P[num])
         print("F1:", torch.max(f1))
 
     return history
