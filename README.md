@@ -1,4 +1,4 @@
-# ECS189G-Project
+# ECS189G-Deep Learning
 
 ECS189G is a Deep Learning upper division course we covered important topics such as:
  - basic math, optimization, machine learning background knowledge
